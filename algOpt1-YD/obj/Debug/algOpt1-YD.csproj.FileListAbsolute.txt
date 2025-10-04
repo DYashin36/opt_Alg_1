@@ -1,0 +1,11 @@
+C:\Users\dyash\source\repos\algOpt1-YD\algOpt1-YD\bin\Debug\algOpt1-YD.exe.config
+C:\Users\dyash\source\repos\algOpt1-YD\algOpt1-YD\bin\Debug\algOpt1-YD.exe
+C:\Users\dyash\source\repos\algOpt1-YD\algOpt1-YD\bin\Debug\algOpt1-YD.pdb
+C:\Users\dyash\source\repos\algOpt1-YD\algOpt1-YD\obj\Debug\algOpt1-YD.csproj.AssemblyReference.cache
+C:\Users\dyash\source\repos\algOpt1-YD\algOpt1-YD\obj\Debug\algOpt1_YD.Form1.resources
+C:\Users\dyash\source\repos\algOpt1-YD\algOpt1-YD\obj\Debug\algOpt1_YD.Properties.Resources.resources
+C:\Users\dyash\source\repos\algOpt1-YD\algOpt1-YD\obj\Debug\algOpt1-YD.csproj.GenerateResource.cache
+C:\Users\dyash\source\repos\algOpt1-YD\algOpt1-YD\obj\Debug\algOpt1-YD.csproj.CoreCompileInputs.cache
+C:\Users\dyash\source\repos\algOpt1-YD\algOpt1-YD\obj\Debug\algOpt1-YD.exe
+C:\Users\dyash\source\repos\algOpt1-YD\algOpt1-YD\obj\Debug\algOpt1-YD.pdb
+C:\Users\dyash\source\repos\algOpt1-YD\algOpt1-YD\obj\Debug\algOpt1_YD.FormSimulation.resources
