@@ -11,6 +11,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using algOpt1_YD.Interfaces;
+using MathNet.Numerics.LinearAlgebra;
 
 namespace algOpt1_YD
 {
@@ -18,6 +19,7 @@ namespace algOpt1_YD
     {
         private Graph graph;
         private ToolTip vertexToolTip = new ToolTip();
+        private static int vertexCounter = 0;
 
         public Form1()
         {
@@ -38,25 +40,30 @@ namespace algOpt1_YD
                 vertexList.Items.Add(v.Label, v.Visible);
             }
 
-            // обновление комбобоксов
-            comboFrom.Items.Clear();
-            comboTo.Items.Clear();
+            // Реальные название (тулТипы) лежат в лейблах, поэтому в комбоБоксы пишем 
+            //comboFrom.Items.Clear();
+            //comboTo.Items.Clear();
             foreach (var v in graph.Vertices)
             {
-                comboFrom.Items.Add(v.Label);
-                comboTo.Items.Add(v.Label);
+                if (!comboFrom.Items.Contains(v.Label)) comboFrom.Items.Add(v.Label);
+                if (!comboTo.Items.Contains(v.Label)) comboTo.Items.Add(v.Label);
             }
+            
 
             graphPanel.Invalidate();
         }
-
+        /// <summary>
+        /// Вспомогатлеьный класс для сериализации графа
+        /// </summary>
         [Serializable]
         public class GraphData
         {
             public List<VertexData> Vertices { get; set; } = new List<VertexData>();
             public List<EdgeData> Edges { get; set; } = new List<EdgeData>();
         }
-
+        /// <summary>
+        /// Вспомогательный класс для сериализации вершины
+        /// </summary>
         [Serializable]
         public class VertexData
         {
@@ -66,7 +73,9 @@ namespace algOpt1_YD
             public bool Visible { get; set; }
             public int Radius { get; set; }
         }
-
+        /// <summary>
+        /// Вспомогательный класс для сериализации связи
+        /// </summary>
         [Serializable]
         public class EdgeData
         {
@@ -77,40 +86,15 @@ namespace algOpt1_YD
 
         public class Vertex : IVertex 
         {
-            //public string Name { get; set; }
-            //public Point Position { get; set; }
-            //public bool Visible { get; set; } = true;
-            //public int Radius { get; set; } = 65;
-
-            //// --- новое поле ---
-            //public double Value { get; set; } = 0;
-
             public Vertex(string name, Point pos)
             {
                 Name = name;
                 Position = pos;
             }
-
-            public void UpdateRadius(Graphics g)
-            {
-                string[] lines = Name.Split(new[] { ' ', '\n' }, StringSplitOptions.RemoveEmptyEntries);
-                float maxWidth = 0;
-                float totalHeight = 0;
-
-                foreach (var line in lines)
-                {
-                    var size = g.MeasureString(line, SystemFonts.DefaultFont);
-                    maxWidth = Math.Max(maxWidth, size.Width);
-                    totalHeight += size.Height;
-                }
-
-                Radius = (int)(Math.Max(maxWidth, totalHeight) / 2) + 10;
-            }
         }
 
         public class Edge : IEdge
         {
-
             public Edge(IVertex from, IVertex to, double weight)
             {
                 From = from;
@@ -121,6 +105,11 @@ namespace algOpt1_YD
         
         public class Graph : IGraph
         {
+            /// <summary>
+            /// Каждая вершина имеет реальное имя (Лейбл) и букву-обозначение. Буква генерируется методом
+            /// </summary>
+            /// <param name="index"></param>
+            /// <returns></returns>
             private string GenerateSystemName(int index)
             {
                 string alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
@@ -133,25 +122,25 @@ namespace algOpt1_YD
                     result = alphabet[i % n] + result;
                     i = i / n - 1;
                 } while (i >= 0);
+                
 
                 return result;
             }
-            //public List<Vertex> Vertices { get; } = new List<Vertex>();
-            //public List<Edge> Edges { get; } = new List<Edge>();
 
             public void AddVertex(string name, Point pos)
             {
-                if (Vertices.Any(vert => vert.Name == name)) return;
-                string sysName = GenerateSystemName(Vertices.Count);
+                if (Vertices.Any(vert => vert.Label == name))
+                    return;
+
+                string sysName = GenerateSystemName(vertexCounter++);
                 var v = new Vertex(sysName, pos) { Label = name };
-                using (var bmp = new Bitmap(1, 1))
-                using (var g = Graphics.FromImage(bmp))
-                {
-                    v.UpdateRadius(g);
-                }
+                v.Radius = 10;
                 Vertices.Add(v);
             }
-
+            /// <summary>
+            /// Размещение по кругу
+            /// </summary>
+            /// <param name="panelSize"></param>
             public void ArrangeCircle(Size panelSize)
             {
                 var verts = Vertices.Where(v => v.Visible).ToList();
@@ -164,7 +153,6 @@ namespace algOpt1_YD
                 int maxRadius = verts.Select(v => v.Radius).DefaultIfEmpty(20).Max();
                 int padding = maxRadius + 20;
 
-                // радиус круга так, чтобы всё влезло
                 double radius = Math.Min(centerX, centerY) - padding;
 
                 for (int i = 0; i < n; i++)
@@ -175,12 +163,6 @@ namespace algOpt1_YD
                     verts[i].Position = new Point(x, y);
                 }
             }
-
-            
-
-           
-
-
             public void RemoveVertex(string name)
             {
                 var v = Vertices.FirstOrDefault(x => x.Name == name);
@@ -281,7 +263,7 @@ namespace algOpt1_YD
                 {
                     if (!v.Visible) continue;
 
-                    g.FillEllipse(Brushes.LightBlue,
+                    g.FillEllipse(Brushes.Coral,
                         v.Position.X - v.Radius, v.Position.Y - v.Radius,
                         v.Radius * 2, v.Radius * 2);
                     g.DrawEllipse(Pens.Black,
@@ -305,15 +287,17 @@ namespace algOpt1_YD
                     DFS(start, start, new List<IVertex>(), cycles, visited);
                 }
 
-                // уберём дубликаты (один и тот же цикл, но сдвинутый по кругу)
                 var unique = new List<List<string>>();
                 var seen = new HashSet<string>();
 
                 foreach (var c in cycles)
                 {
-                    var norm = NormalizeCycle(c);
-                    if (seen.Add(norm))
-                        unique.Add(c);
+                    if (c.All(name => Vertices.First(v => v.Name == name).Visible))
+                    {
+                        var norm = NormalizeCycle(c);
+                        if (seen.Add(norm))
+                            unique.Add(c);
+                    }
                 }
 
                 return unique;
@@ -323,20 +307,26 @@ namespace algOpt1_YD
                              List<List<string>> cycles, HashSet<string> visited)
             {
                 if (!current.Visible) return;
+
                 path.Add(current);
 
-                foreach (var e in Edges.Where(ed => ed.From == current && ed.Visible))
+                foreach (var e in Edges)
                 {
-                    if (e.To == start && path.Count > 1)
+                    if (!e.From.Visible || !e.To.Visible)
+                        continue;
+
+                    if (e.From == current)
                     {
-                        // нашли цикл, фиксируем и останавливаем
-                        cycles.Add(path.Select(v => v.Name).ToList());
+                        if (e.To == start && path.Count > 1)
+                        {
+                            if (path.All(v => v.Visible))
+                                cycles.Add(path.Select(v => v.Name).ToList());
+                        }
+                        else if (!path.Contains(e.To))
+                        {
+                            DFS(e.To, start, new List<IVertex>(path), cycles, visited);
+                        }
                     }
-                    else if (!path.Contains(e.To))
-                    {
-                        DFS(e.To, start, new List<IVertex>(path), cycles, visited);
-                    }
-                    // если e.To уже есть в path и это НЕ start — пропускаем
                 }
             }
 
@@ -367,30 +357,6 @@ namespace algOpt1_YD
                     product *= edge.Weight;
                 }
                 return product;
-            }
-
-            public void StepSimulation()
-            {
-                var newValues = new Dictionary<IVertex, double>();
-
-                foreach (var v in Vertices)
-                {
-                    if (!v.Visible) continue;
-
-                    double sum = 0;
-                    foreach (var e in Edges.Where(ed => ed.To == v && ed.Visible))
-                    {
-                        sum += e.From.Value * e.Weight;
-                    }
-
-                    newValues[v] = sum; // либо Math.Tanh(sum) для стабилизации
-                }
-
-                foreach (var v in Vertices)
-                {
-                    if (newValues.ContainsKey(v))
-                        v.Value = newValues[v];
-                }
             }
 
             public void SaveToFile(string filename)
@@ -540,24 +506,22 @@ namespace algOpt1_YD
 
         private void btnShowCycles_Click(object sender, EventArgs e)
         {
+            int countMinus = 0;
+            int countPlus = 0;
             var cycles = graph.FindCycles();
             txtCycles.Clear();
-
-            txtCycles.AppendText("Цикл".PadRight(25) + "| Знак |\n");
-            txtCycles.AppendText(new string('-', 35) + "\n");
 
             foreach (var cycle in cycles)
             {
                 double w = graph.CycleWeight(cycle);
                 string sign = w < 0 ? "-" : "+";
-
-                // цикл с возвратом в начало
+                if (sign == "-") countMinus++;
+                else countPlus++;
                 string cycleText = string.Join(" -> ", cycle) + " -> " + cycle[0];
 
-                txtCycles.AppendText(cycleText.PadRight(25) + "|  " + sign + "   |\n");
+                txtCycles.AppendText($"[{cycleText}]; Знак: {sign}\r\n");
             }
-
-            txtCycles.AppendText(new string('-', 35) + "\n");
+            txtCycles.AppendText("Число '-' циклов: " + countMinus + "; Число '+' циклов: " + countPlus);
 
             // проверка устойчивости
             int negativeCount = cycles.Count(c => graph.CycleWeight(c) < 0);
@@ -636,6 +600,56 @@ namespace algOpt1_YD
             }
             vertexToolTip.SetToolTip(graphPanel, "");
         }
+
+        private void matrixBtn_Click(object sender, EventArgs e)
+        {
+            //if (IsStableByPerturbations(out double radius))
+            //{
+            //    MessageBox.Show($"Система устойчива по возмущениям. " +
+            //                    $"|M| = {radius:0.###} < 1");
+            //}
+            //else
+            //{
+            //    MessageBox.Show($"Система НЕустойчива по возмущениям. " +
+            //                    $"|M| = {radius:0.###}");
+            //}
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            graph.Vertices = new List<IVertex>();
+            graph.Edges = new List<IEdge>();
+            UpdateUI();
+        }
+
+        //public bool IsStableByPerturbations(out double spectralRadius)
+        //{
+        //    int n = graph.Vertices.Count;
+        //    if (n == 0)
+        //    {
+        //        spectralRadius = 0;
+        //        return true;
+        //    }
+
+        //    // формируем матрицу смежности
+        //    var matrix = Matrix<double>.Build.Dense(n, n, 0);
+        //    foreach (var e in graph.Edges.Where(ed => ed.Visible))
+        //    {
+        //        int fromIndex = graph.Vertices.IndexOf((Vertex)e.From);
+        //        int toIndex = graph.Vertices.IndexOf((Vertex)e.To);
+        //        matrix[fromIndex, toIndex] = e.Weight;
+        //    }
+
+        //    // находим собственные значения
+        //    var evd = matrix.Evd();
+        //    var eigenValues = evd.EigenValues;
+
+        //    // спектральный радиус
+        //    spectralRadius = eigenValues.Select(ev => ev.Magnitude).Max();
+
+        //    // критерий устойчивости
+        //    return spectralRadius < 1.0;
+        //}
     }
 
 }

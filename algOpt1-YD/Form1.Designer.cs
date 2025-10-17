@@ -48,6 +48,8 @@ namespace algOpt1_YD
             this.btnLoad = new System.Windows.Forms.Button();
             this.txtCycles = new System.Windows.Forms.RichTextBox();
             this.btnSimulation = new System.Windows.Forms.Button();
+            this.matrixBtn = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.panel1.SuspendLayout();
             this.SuspendLayout();
             // 
@@ -212,7 +214,7 @@ namespace algOpt1_YD
             // 
             // btnSimulation
             // 
-            this.btnSimulation.Location = new System.Drawing.Point(331, 625);
+            this.btnSimulation.Location = new System.Drawing.Point(331, 605);
             this.btnSimulation.Name = "btnSimulation";
             this.btnSimulation.Size = new System.Drawing.Size(110, 40);
             this.btnSimulation.TabIndex = 16;
@@ -220,11 +222,34 @@ namespace algOpt1_YD
             this.btnSimulation.UseVisualStyleBackColor = true;
             this.btnSimulation.Click += new System.EventHandler(this.btnSimulation_Click);
             // 
+            // matrixBtn
+            // 
+            this.matrixBtn.Location = new System.Drawing.Point(331, 713);
+            this.matrixBtn.Name = "matrixBtn";
+            this.matrixBtn.Size = new System.Drawing.Size(110, 40);
+            this.matrixBtn.TabIndex = 17;
+            this.matrixBtn.Text = "Устойчивость";
+            this.matrixBtn.UseVisualStyleBackColor = true;
+            this.matrixBtn.Visible = false;
+            this.matrixBtn.Click += new System.EventHandler(this.matrixBtn_Click);
+            // 
+            // button1
+            // 
+            this.button1.Location = new System.Drawing.Point(331, 664);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(110, 40);
+            this.button1.TabIndex = 18;
+            this.button1.Text = "Удалить Всё";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(961, 824);
+            this.Controls.Add(this.button1);
+            this.Controls.Add(this.matrixBtn);
             this.Controls.Add(this.btnSimulation);
             this.Controls.Add(this.txtCycles);
             this.Controls.Add(this.btnLoad);
@@ -239,6 +264,8 @@ namespace algOpt1_YD
             this.Controls.Add(this.btnShowCycles);
             this.Controls.Add(this.vertexList);
             this.Controls.Add(this.graphPanel);
+            this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedToolWindow;
+            this.MaximizeBox = false;
             this.Name = "Form1";
             this.Text = "Form1";
             this.Load += new System.EventHandler(this.Form1_Load);
@@ -269,6 +296,8 @@ namespace algOpt1_YD
         private System.Windows.Forms.Button btnLoad;
         private System.Windows.Forms.RichTextBox txtCycles;
         private System.Windows.Forms.Button btnSimulation;
+        private System.Windows.Forms.Button matrixBtn;
+        private System.Windows.Forms.Button button1;
     }
 }
 

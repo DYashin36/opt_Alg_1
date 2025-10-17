@@ -29,9 +29,9 @@ namespace algOpt1_YD
         /// </summary>
         private void InitializeComponent()
         {
-            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea1 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
-            System.Windows.Forms.DataVisualization.Charting.Legend legend1 = new System.Windows.Forms.DataVisualization.Charting.Legend();
-            System.Windows.Forms.DataVisualization.Charting.Series series1 = new System.Windows.Forms.DataVisualization.Charting.Series();
+            System.Windows.Forms.DataVisualization.Charting.ChartArea chartArea2 = new System.Windows.Forms.DataVisualization.Charting.ChartArea();
+            System.Windows.Forms.DataVisualization.Charting.Legend legend2 = new System.Windows.Forms.DataVisualization.Charting.Legend();
+            System.Windows.Forms.DataVisualization.Charting.Series series2 = new System.Windows.Forms.DataVisualization.Charting.Series();
             this.chart1 = new System.Windows.Forms.DataVisualization.Charting.Chart();
             this.btnStep = new System.Windows.Forms.Button();
             this.simBox = new System.Windows.Forms.CheckedListBox();
@@ -39,27 +39,25 @@ namespace algOpt1_YD
             this.btnNSteps = new System.Windows.Forms.Button();
             this.vertexValueGrid = new System.Windows.Forms.DataGridView();
             this.btnWeightsSet = new System.Windows.Forms.Button();
-            this.impulseGrid = new System.Windows.Forms.DataGridView();
             this.cleanBtn = new System.Windows.Forms.Button();
             this.readyBtn = new System.Windows.Forms.Button();
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).BeginInit();
             ((System.ComponentModel.ISupportInitialize)(this.vertexValueGrid)).BeginInit();
-            ((System.ComponentModel.ISupportInitialize)(this.impulseGrid)).BeginInit();
             this.SuspendLayout();
             // 
             // chart1
             // 
-            chartArea1.Name = "ChartArea1";
-            this.chart1.ChartAreas.Add(chartArea1);
-            legend1.Name = "Legend1";
-            this.chart1.Legends.Add(legend1);
+            chartArea2.Name = "ChartArea1";
+            this.chart1.ChartAreas.Add(chartArea2);
+            legend2.Name = "Legend1";
+            this.chart1.Legends.Add(legend2);
             this.chart1.Location = new System.Drawing.Point(12, 12);
             this.chart1.Name = "chart1";
-            series1.ChartArea = "ChartArea1";
-            series1.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
-            series1.Legend = "Legend1";
-            series1.Name = "Series1";
-            this.chart1.Series.Add(series1);
+            series2.ChartArea = "ChartArea1";
+            series2.ChartType = System.Windows.Forms.DataVisualization.Charting.SeriesChartType.Spline;
+            series2.Legend = "Legend1";
+            series2.Name = "Series1";
+            this.chart1.Series.Add(series2);
             this.chart1.Size = new System.Drawing.Size(855, 410);
             this.chart1.TabIndex = 0;
             this.chart1.Text = "chart1";
@@ -122,33 +120,22 @@ namespace algOpt1_YD
             this.btnWeightsSet.UseVisualStyleBackColor = true;
             this.btnWeightsSet.Click += new System.EventHandler(this.btnWeightsSet_Click);
             // 
-            // impulseGrid
-            // 
-            this.impulseGrid.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.impulseGrid.Location = new System.Drawing.Point(1225, 12);
-            this.impulseGrid.Name = "impulseGrid";
-            this.impulseGrid.RowHeadersWidth = 51;
-            this.impulseGrid.RowTemplate.Height = 24;
-            this.impulseGrid.Size = new System.Drawing.Size(445, 410);
-            this.impulseGrid.TabIndex = 7;
-            this.impulseGrid.CellContentClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.impulseGrid_CellContentClick);
-            this.impulseGrid.CellValueChanged += new System.Windows.Forms.DataGridViewCellEventHandler(this.impulseGrid_CellValueChanged);
-            // 
             // cleanBtn
             // 
-            this.cleanBtn.Location = new System.Drawing.Point(301, 500);
+            this.cleanBtn.Location = new System.Drawing.Point(296, 553);
             this.cleanBtn.Name = "cleanBtn";
             this.cleanBtn.Size = new System.Drawing.Size(99, 38);
             this.cleanBtn.TabIndex = 8;
             this.cleanBtn.Text = "Очистить";
             this.cleanBtn.UseVisualStyleBackColor = true;
+            this.cleanBtn.Visible = false;
             this.cleanBtn.Click += new System.EventHandler(this.cleanBtn_Click);
             // 
             // readyBtn
             // 
-            this.readyBtn.Location = new System.Drawing.Point(301, 553);
+            this.readyBtn.Location = new System.Drawing.Point(296, 500);
             this.readyBtn.Name = "readyBtn";
-            this.readyBtn.Size = new System.Drawing.Size(99, 47);
+            this.readyBtn.Size = new System.Drawing.Size(99, 38);
             this.readyBtn.TabIndex = 9;
             this.readyBtn.Text = "Применить";
             this.readyBtn.UseVisualStyleBackColor = true;
@@ -158,10 +145,9 @@ namespace algOpt1_YD
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(8F, 16F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(882, 644);
+            this.ClientSize = new System.Drawing.Size(877, 644);
             this.Controls.Add(this.readyBtn);
             this.Controls.Add(this.cleanBtn);
-            this.Controls.Add(this.impulseGrid);
             this.Controls.Add(this.btnWeightsSet);
             this.Controls.Add(this.vertexValueGrid);
             this.Controls.Add(this.btnNSteps);
@@ -174,7 +160,6 @@ namespace algOpt1_YD
             this.Load += new System.EventHandler(this.FormSimulation_Load);
             ((System.ComponentModel.ISupportInitialize)(this.chart1)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.vertexValueGrid)).EndInit();
-            ((System.ComponentModel.ISupportInitialize)(this.impulseGrid)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -189,7 +174,6 @@ namespace algOpt1_YD
         private System.Windows.Forms.Button btnNSteps;
         private System.Windows.Forms.DataGridView vertexValueGrid;
         private System.Windows.Forms.Button btnWeightsSet;
-        private System.Windows.Forms.DataGridView impulseGrid;
         private System.Windows.Forms.Button cleanBtn;
         private System.Windows.Forms.Button readyBtn;
     }

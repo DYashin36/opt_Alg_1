@@ -9,3 +9,8 @@ C:\Users\dyash\source\repos\algOpt1-YD\algOpt1-YD\obj\Debug\algOpt1-YD.csproj.Co
 C:\Users\dyash\source\repos\algOpt1-YD\algOpt1-YD\obj\Debug\algOpt1-YD.exe
 C:\Users\dyash\source\repos\algOpt1-YD\algOpt1-YD\obj\Debug\algOpt1-YD.pdb
 C:\Users\dyash\source\repos\algOpt1-YD\algOpt1-YD\obj\Debug\algOpt1_YD.FormSimulation.resources
+C:\Users\dyash\source\repos\algOpt1-YD\algOpt1-YD\bin\Debug\MathNet.Numerics.dll
+C:\Users\dyash\source\repos\algOpt1-YD\algOpt1-YD\bin\Debug\System.ValueTuple.dll
+C:\Users\dyash\source\repos\algOpt1-YD\algOpt1-YD\bin\Debug\MathNet.Numerics.xml
+C:\Users\dyash\source\repos\algOpt1-YD\algOpt1-YD\bin\Debug\System.ValueTuple.xml
+C:\Users\dyash\source\repos\algOpt1-YD\algOpt1-YD\obj\Debug\algOpt1-YD.csproj.CopyComplete

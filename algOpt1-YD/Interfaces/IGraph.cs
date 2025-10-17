@@ -9,8 +9,8 @@ namespace algOpt1_YD.Interfaces
 {
     public abstract class IGraph
     {
-        public List<IVertex> Vertices { get; } = new List<IVertex>();
-        public List<IEdge> Edges { get; } = new List<IEdge>();
+        public List<IVertex> Vertices { get; set; } = new List<IVertex>();
+        public List<IEdge> Edges { get; set; } = new List<IEdge>();
     }
 
     public abstract class IVertex

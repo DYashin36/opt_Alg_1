@@ -21,11 +21,12 @@ namespace algOpt1_YD
 
             InitializeGrids();
             InitializeChartAndSeries();
+
+            vertexValueGrid.DataError += (s, e) => e.ThrowException = false;
         }
 
         private void InitializeGrids()
         {
-            // Вершины
             vertexValueGrid.Visible = false;
             vertexValueGrid.Rows.Clear();
             vertexValueGrid.Columns.Clear();
@@ -42,28 +43,11 @@ namespace algOpt1_YD
                     vertexValueGrid.CommitEdit(DataGridViewDataErrorContexts.Commit);
             };
 
-            // Связи
-            impulseGrid.Columns.Clear();
-            impulseGrid.ColumnCount = 3;
-            impulseGrid.Columns[0].Name = "From";
-            impulseGrid.Columns[0].ReadOnly = true;
-            impulseGrid.Columns[1].Name = "To";
-            impulseGrid.Columns[1].ReadOnly = true;
-            impulseGrid.Columns[2].Name = "Impulse";
-            impulseGrid.Columns[2].ValueType = typeof(double);
-
-            impulseGrid.CellValueChanged += Grid_CellValueChanged;
-            impulseGrid.CurrentCellDirtyStateChanged += (s, e) =>
-            {
-                if (impulseGrid.IsCurrentCellDirty)
-                    impulseGrid.CommitEdit(DataGridViewDataErrorContexts.Commit);
-            };
-
-            // Инициализация значений 0
             foreach (var v in graph.Vertices)
-                vertexValueGrid.Rows.Add(v.Label, 0.0);
-            foreach (var e in graph.Edges)
-                impulseGrid.Rows.Add(e.From.Label, e.To.Label, 0.0);
+            {
+                vertexValueGrid.Rows.Add(v.Label, v.Value);
+            }
+
         }
 
         private void InitializeChartAndSeries()
@@ -71,12 +55,12 @@ namespace algOpt1_YD
             chart1.Series.Clear();
             chart1.ChartAreas.Clear();
             chart1.ChartAreas.Add(new ChartArea("Default"));
+            chart1.ChartAreas["Default"].AxisY.Title = "Значение вершины";
+            chart1.ChartAreas["Default"].AxisX.Title = "Шаг симуляции";
             simBox.Items.Clear();
 
             foreach (var v in graph.Vertices)
             {
-                v.Value = 0;
-
                 var series = new Series(v.Label)
                 {
                     ChartType = SeriesChartType.Line,
@@ -84,6 +68,8 @@ namespace algOpt1_YD
                     Name = v.Label
                 };
                 chart1.Series.Add(series);
+
+                // стартовая точка = текущее значение вершины
                 series.Points.AddXY(0, v.Value);
 
                 simBox.Items.Add(v.Label, true);
@@ -96,16 +82,13 @@ namespace algOpt1_YD
         {
             var vertexName = simBox.Items[e.Index].ToString();
             bool isChecked = e.NewValue == CheckState.Checked;
-
             if (chart1.Series.IndexOf(vertexName) >= 0)
                 chart1.Series[vertexName].Enabled = isChecked;
         }
 
         private void Grid_CellValueChanged(object sender, DataGridViewCellEventArgs e)
         {
-            if(e.RowIndex < 0) return;
-
-            // Если изменились значения, не трогаем серию, просто обновляем вершину или связь
+            if (e.RowIndex < 0) return;
             if (sender == vertexValueGrid && e.ColumnIndex == 1)
             {
                 var row = vertexValueGrid.Rows[e.RowIndex];
@@ -114,16 +97,6 @@ namespace algOpt1_YD
                 var vertex = graph.Vertices.FirstOrDefault(v => v.Label == vertexName);
                 if (vertex != null)
                     vertex.Value = val;
-            }
-            else if (sender == impulseGrid && e.ColumnIndex == 2)
-            {
-                var row = impulseGrid.Rows[e.RowIndex];
-                string fromName = row.Cells[0].Value?.ToString();
-                string toName = row.Cells[1].Value?.ToString();
-                if (!double.TryParse(row.Cells[2].Value?.ToString(), out double val)) return;
-                var edge = graph.Edges.FirstOrDefault(ed => ed.From.Label == fromName && ed.To.Label == toName);
-                if (edge != null)
-                    edge.Weight = val;
             }
         }
 
@@ -147,62 +120,69 @@ namespace algOpt1_YD
                 MessageBox.Show("Назначьте значения для всех вершин перед выполнением шага.");
                 return;
             }
-
             StepSimulation();
+        }
+
+        private Dictionary<IVertex, double> nextStepImpulses = new Dictionary<IVertex, double>();
+
+        private void InitializeImpulses()
+        {
+            nextStepImpulses.Clear();
+            foreach (var v in graph.Vertices)
+            {
+                // вершины из грида — источники первого шага
+                nextStepImpulses[v] = v.Value;
+
+                // НЕ обнуляем v.Value! Он показывает текущие накопленные значения
+                // v.Value = 0; // <- убрать эту строку
+            }
         }
 
         private void StepSimulation()
         {
-            var newValues = new Dictionary<IVertex, double>();
-
+            // буфер для импульсов на этот шаг
+            var impulsesThisStep = new Dictionary<IVertex, double>();
             foreach (var v in graph.Vertices)
+                impulsesThisStep[v] = 0;
+
+            // из вершин, которые были источниками на этом шаге (nextStepImpulses),
+            // отправляем импульсы по всем исходящим ребрам
+            foreach (var e in graph.Edges)
             {
-                if (!v.Visible) continue;
-
-                double sum = 0;
-                foreach (var e in graph.Edges)
-                    if (e.To == v && e.Visible)
-                        sum += e.From.Value * e.Weight;
-
-                sum += GetImpulseForVertex(v);
-
-                newValues[v] = sum;
+                if (nextStepImpulses.TryGetValue(e.From, out double fromValue) && fromValue != 0)
+                {
+                    impulsesThisStep[e.To] += fromValue * e.Weight;
+                }
             }
 
-            foreach (var v in newValues.Keys)
-                v.Value = newValues[v];
+            // обновляем значения вершин: суммируем поступившие импульсы
+            foreach (var v in graph.Vertices)
+            {
+                v.Value += impulsesThisStep[v];
+            }
+
+            // на следующий шаг источниками будут те вершины, которые получили импульсы сейчас
+            nextStepImpulses = new Dictionary<IVertex, double>(impulsesThisStep);
 
             step++;
 
+            // добавляем точки на график
             foreach (var v in graph.Vertices)
+            {
                 chart1.Series[v.Label].Points.AddXY(step, v.Value);
+            }
         }
+
+
 
         private void btnWeightsSet_Click(object sender, EventArgs e)
         {
             gridVisible = !gridVisible;
             vertexValueGrid.Visible = gridVisible;
-            impulseGrid.Visible = gridVisible;
-            Width = gridVisible ? 1278 : 677;
+            Width = gridVisible ? 928 : 677;
+            btnWeightsSet.Text = gridVisible ? "<<" : ">>";
         }
 
-        private double GetImpulseForVertex(IVertex v)
-        {
-            double sum = 0.0;
-            foreach (DataGridViewRow row in impulseGrid.Rows)
-            {
-                if (row.IsNewRow) continue;
-                string fromName = row.Cells[0].Value?.ToString();
-                string toName = row.Cells[1].Value?.ToString();
-                if (toName == v.Label && double.TryParse(row.Cells[2].Value?.ToString(), out double w))
-                {
-                    var fromVertex = graph.Vertices.FirstOrDefault(x => x.Label == fromName);
-                    if (fromVertex != null)
-                        sum += fromVertex.Value * w;
-                }
-            }
-            return sum;
-        }
 
         private void button1_Click(object sender, EventArgs e)
         {
@@ -238,13 +218,14 @@ namespace algOpt1_YD
 
         private void readyBtn_Click(object sender, EventArgs e)
         {
+
             ApplyGridValues();
             ResetChart();
+            InitializeImpulses();
         }
 
         private void ApplyGridValues()
         {
-            // Применяем значения вершин
             foreach (DataGridViewRow row in vertexValueGrid.Rows)
             {
                 if (row.IsNewRow) continue;
@@ -253,18 +234,6 @@ namespace algOpt1_YD
                 var vertex = graph.Vertices.FirstOrDefault(v => v.Label == vertexName);
                 if (vertex != null)
                     vertex.Value = val;
-            }
-
-            // Применяем значения связей
-            foreach (DataGridViewRow row in impulseGrid.Rows)
-            {
-                if (row.IsNewRow) continue;
-                string fromName = row.Cells[0].Value?.ToString();
-                string toName = row.Cells[1].Value?.ToString();
-                if (!double.TryParse(row.Cells[2].Value?.ToString(), out double val)) continue;
-                var edge = graph.Edges.FirstOrDefault(ed => ed.From.Label == fromName && ed.To.Label == toName);
-                if (edge != null)
-                    edge.Weight = val;
             }
         }
     }
